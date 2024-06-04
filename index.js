@@ -1,22 +1,23 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
+const qrcode = require('qrcode-terminal');
 const PUPPETEER_ARGS = [
 	'--no-sandbox',
-	// '--disable-setuid-sandbox',
-	// '--unhandled-rejections=strict',
-	// '--disable-dev-shm-usage',
-	// '--disable-accelerated-2d-canvas',
-	// '--no-first-run',
-	// '--no-zygote',
-	// '--single-process', // <- this one doesn't works in Windows
-	// '--disable-gpu',
+	'--disable-setuid-sandbox',
+	'--unhandled-rejections=strict',
+	'--disable-dev-shm-usage',
+	'--disable-accelerated-2d-canvas',
+	'--no-first-run',
+	'--no-zygote',
+	'--single-process', // <- this one doesn't works in Windows
+	'--disable-gpu',
 ];
 const client = new Client({
 	restartOnAuthFail: true,
 
 	puppeteer: {
-		headless: false,
+		headless: true,
 		args: PUPPETEER_ARGS,
-		executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+		// executablePath: CHROMIUM_PATH,
 	},
 
 	authStrategy: new LocalAuth({
@@ -29,16 +30,15 @@ const client = new Client({
 	},
 });
 
-client.on('qr', async (qrCode) => {
-	console.log(`qrCode: ${qrCode}`);
+// When the client is ready, run this code (only once)
+client.once('ready', () => {
+	console.log('Client is ready!');
 });
 
-client.on('authenticated', async () => {
-	console.log(`${this.client_id}`);
+// When the client received QR-Code
+client.on('qr', (qr) => {
+	qrcode.generate(qr, { small: true });
 });
 
-client.on('ready', async () => {
-	console.log(`${this.client_id}`);
-});
-
+// Start your client
 client.initialize();
